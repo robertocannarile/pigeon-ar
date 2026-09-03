@@ -1,6 +1,8 @@
 # Pigeon AR
 
-Esperienza di realtà aumentata da browser: rileva il pavimento, tocchi, appare un piccione
+**→ https://robertocannarile.github.io/pigeon-ar/**
+
+Esperienza di realtà aumentata da browser: tieni premuto sul pavimento e appare un piccione
 a scala reale che cammina in loop.
 
 Costruita con il motore **8th Wall** (open source dal 28/02/2026, `8thwall.org`) + **A-Frame**.
@@ -22,9 +24,13 @@ Pigeon/
 
 1. Apri il link → il browser chiede fotocamera e sensori di movimento
 2. Muovi il telefono qualche secondo → lo SLAM aggancia il piano del pavimento
-3. Compare un **reticolo bianco** a terra sotto il puntamento
-4. **Tap** → il piccione si posiziona lì, rivolto verso di te, con ombra
-5. **Pinch** = scala · **due dita** = rotazione · **tap altrove** = sposta
+3. **Tieni premuto 600 ms** sul pavimento: un cerchio si stringe sotto il dito, poi il
+   piccione appare lì con la sua ombra. Il tap breve è volutamente inerte
+4. **Pinch** = scala (fino a 150×) · **due dita che ruotano** = rotazione
+5. **Doppio tap** = pannello di taratura della luce (temporaneo, vedi `HANDOFF.md`)
+
+L'orientamento verso la camera si applica solo al primo piazzamento: dopo, spostare il
+piccione non cancella la rotazione impostata a mano.
 
 Il modello è 0,42 × 0,21 × 0,22 m, cioè la taglia di un piccione vero. Scala 1:1.
 
@@ -36,26 +42,29 @@ La fotocamera richiede **HTTPS** (o `localhost`): da telefono serve un tunnel.
 cd app
 npx --yes serve -p 3000
 # in un altro terminale
-npx --yes ngrok http 3000
+npx --yes cloudflared tunnel --url http://localhost:3000
 ```
 
-Apri sul telefono l'URL `https://...ngrok...` che ti stampa.
+Apri sul telefono l'URL `https://...trycloudflare.com` che stampa.
+
+Nota: `serve` fa clean-URL, `/index.html` redirige a `/index`. Provando con `curl` serve
+`-L`, altrimenti sembra che il file sia vuoto.
 
 ## Pubblicazione
 
-Va bene qualsiasi hosting statico. Il contenuto da caricare è **`app/`**.
+Già pubblicato su GitHub Pages: **https://robertocannarile.github.io/pigeon-ar/**
 
-**GitHub Pages**
+Il sito è il contenuto di `app/`, servito dal branch `gh-pages`. Per pubblicare le modifiche:
 
 ```bash
-git init && git add . && git commit -m "Pigeon AR"
-git branch -M main
-git remote add origin git@github.com:<utente>/pigeon-ar.git
-git push -u origin main
-# Settings → Pages → Source: main, folder /app
+git add -A && git commit -m "..."
+git push
+git subtree push --prefix app origin gh-pages
 ```
 
-**Netlify** — trascina la cartella `app/` su https://app.netlify.com/drop
+Il primo push aggiorna il repo, il secondo il sito. Se `subtree push` viene rifiutato perché
+la storia è divergente, rifare con
+`git push origin $(git subtree split --prefix app main):gh-pages --force`.
 
 ## Requisiti dispositivo
 
