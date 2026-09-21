@@ -150,6 +150,12 @@ AFRAME.registerComponent('shadow-fit', {
     this.sinceCheck = 0
   },
 
+  // Cambiando target il raggio memorizzato non vale piu': senza azzerarlo il confronto
+  // "variazione sotto il 5%" puo' bloccare il primo ricalcolo sul nuovo modello.
+  update(oldData) {
+    if (oldData && oldData.target !== this.data.target) { this.lastRadius = -1 }
+  },
+
   tick(time, timeDelta) {
     // Throttle a mano: ricalcolare il bounding box a 60 fps sarebbe sprecato.
     this.sinceCheck += timeDelta
@@ -205,7 +211,7 @@ AFRAME.registerComponent('light-tuner', {
     hemi: {type: 'selector'},
     target: {type: 'selector'},
     minScale: {default: 0.5},
-    maxScale: {default: 150},
+    maxScale: {default: 200},
     doubleTapMs: {default: 320},   // finestra entro cui due tap contano come doppio tap
     doubleTapPx: {default: 40},    // e distanza massima tra i due
   },
