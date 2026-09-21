@@ -58,24 +58,6 @@
     /* Il logo "Powered by 8th Wall" degli schermi di caricamento/errore di xrextras. */
     .poweredby-img { display: none !important; }
 
-    /* Attribuzione richiesta dalla licenza del motore, vedi il markup sotto. */
-    #engine-credit {
-      position: fixed;
-      bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
-      left: 50%;
-      transform: translateX(-50%);
-      max-width: 92vw;
-      text-align: center;
-      color: rgba(255, 255, 255, .5);
-      text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
-      font: 400 10px/1.35 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      z-index: 12;
-      pointer-events: none;
-    }
-
-    /* Solo il link intercetta il tocco: il resto lo passa al canvas del piazzamento. */
-    #engine-credit a { color: inherit; pointer-events: auto; }
-
     /* Pannello di taratura, aperto con doppio tap. Da rimuovere a valori fissati. */
     #tuner {
       position: fixed;
@@ -134,13 +116,10 @@
 
   <div id="press" hidden></div>
 
-  <!-- Attribuzione al motore AR, richiesta dalla sua licenza (XR Engine License
-       Agreement, 1.3.1.2): creatore, copyright, rimando alla licenza e disclaimer. -->
-  <div id="engine-credit">
-    AR engine &copy; 2026 Niantic Spatial, Inc. &mdash;
-    <a href="https://8thwall.org/docs/open-source" target="_blank" rel="noopener">licenza</a>
-    &middot; fornito &ldquo;as is&rdquo;, senza garanzie
-  </div>
+  <!-- Motore AR: XR Engine, © 2026 Niantic Spatial, Inc. Distribuito sotto XR Engine
+       License Agreement (https://8thwall.org/docs/open-source), fornito "as is", senza
+       garanzie. La licenza chiede questa attribuzione nel materiale che usa il motore;
+       su richiesta dell'utente non è visibile a schermo, resta qui e nel README. -->
 
   <!-- Pannello di taratura: doppio tap sullo schermo per aprirlo e chiuderlo. -->
   <div id="tuner" hidden>
