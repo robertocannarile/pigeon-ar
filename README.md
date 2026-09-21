@@ -1,6 +1,7 @@
 # Pigeon AR
 
-**→ https://robertocannarile.github.io/pigeon-ar/**
+**Un piccione → https://robertocannarile.github.io/pigeon-ar/**
+**Più piccioni → https://robertocannarile.github.io/pigeon-ar/multi/**
 
 Esperienza di realtà aumentata da browser: tieni premuto sul pavimento e appare un piccione
 a scala reale che cammina in loop.
@@ -15,9 +16,12 @@ Pigeon/
 ├─ Model/pigeon.glb        # sorgente originale
 ├─ README.md
 └─ app/                    # <- questa cartella è il sito da pubblicare
-   ├─ index.html
-   ├─ place-pigeon.js
-   └─ assets/pigeon.glb
+   ├─ index.html           # versione a un piccione
+   ├─ place-pigeon.js      # env-light, play-clip, shadow-fit, light-tuner, tap-place
+   ├─ assets/pigeon.glb
+   └─ multi/               # versione a più piccioni, stesso glb
+      ├─ index.html
+      └─ place-pigeons.js  # solo multi-place; il resto lo riusa da ../place-pigeon.js
 ```
 
 ## Come funziona
@@ -26,11 +30,27 @@ Pigeon/
 2. Muovi il telefono qualche secondo → lo SLAM aggancia il piano del pavimento
 3. **Tieni premuto 600 ms** sul pavimento: un cerchio si stringe sotto il dito, poi il
    piccione appare lì con la sua ombra. Il tap breve è volutamente inerte
-4. **Pinch** = scala (fino a 150×) · **due dita che ruotano** = rotazione
+4. **Pinch** = scala (fino a 200×) · **due dita che ruotano** = rotazione
 5. **Doppio tap** = pannello di taratura della luce (temporaneo, vedi `HANDOFF.md`)
 
 L'orientamento verso la camera si applica solo al primo piazzamento: dopo, spostare il
 piccione non cancella la rotazione impostata a mano.
+
+### Versione a più piccioni (`/multi/`)
+
+Stessi gesti, ma la pressione prolungata **aggiunge** un piccione invece di spostare quello
+che c'è. Il nuovo diventa l'attivo; **tap breve su un piccione** lo rende attivo a sua volta,
+e l'hint in basso mostra quale. Pinch e rotazione agiscono solo sull'attivo: i componenti
+`xrextras-pinch-scale` e `xrextras-two-finger-rotate` ascoltano `twofingermove` sulla scena,
+quindi lasciarli su tutti li farebbe reagire tutti insieme, e vivono solo sull'attivo.
+
+`pinch-scale` fotografa la scala dell'entità al proprio init e tratta `min`/`max` come
+moltiplicatori di quella: perché i limiti restino assoluti, `multi-place` li ricalcola a ogni
+selezione in rapporto alla scala corrente.
+
+Non c'è modo di togliere un piccione: per ripulire si ricarica la pagina. `shadow-fit` segue
+l'attivo, quindi con un gigante in scena l'ombra di un piccolo molto lontano può uscire dai
+bounds della shadow camera.
 
 Il modello è 0,42 × 0,21 × 0,22 m, cioè la taglia di un piccione vero. Scala 1:1.
 

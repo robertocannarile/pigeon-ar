@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Pigeon AR — multiplo</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.7.1/dist/aframe-master.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js" async crossorigin="anonymous"
+    data-preload-chunks="slam"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
+
+  <!-- env-light, play-clip e shadow-fit sono gli stessi della versione singola. -->
+  <script src="../place-pigeon.js"></script>
+  <script src="./place-pigeons.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; }
+
+    /* Il logo "Powered by 8th Wall" degli schermi di caricamento/errore di xrextras. */
+    .poweredby-img { display: none !important; }
+
+    #hint {
+      position: fixed;
+      bottom: 7vh;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .55);
+      color: #fff;
+      font: 500 15px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: .01em;
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+      transition: opacity .4s ease;
+    }
+
+    #hint.hidden { opacity: 0; }
+
+    /* Cerchio che si chiude sotto il dito durante la pressione prolungata. */
+    #press {
+      position: fixed;
+      width: 76px;
+      height: 76px;
+      margin: -38px 0 0 -38px;
+      border: 2px solid rgba(255, 255, 255, .9);
+      border-radius: 50%;
+      z-index: 15;
+      pointer-events: none;
+      opacity: .35;
+      transform: scale(1);
+      transition-property: transform, opacity;
+      transition-timing-function: linear;
+    }
+
+    #press.active { transform: scale(.32); opacity: 1; }
+
+    #press[hidden] { display: none; }
+  </style>
+</head>
+
+<body>
+  <div id="hint">Muovi il telefono, poi tieni premuto sul pavimento</div>
+
+  <div id="press" hidden></div>
+
+  <!-- Motore AR: XR Engine, © 2026 Niantic Spatial, Inc. Distribuito sotto XR Engine
+       License Agreement (https://8thwall.org/docs/open-source), fornito "as is", senza
+       garanzie. La licenza chiede questa attribuzione nel materiale che usa il motore;
+       su richiesta dell'utente non è visibile a schermo, resta qui e nel README. -->
+
+  <a-scene
+    xrweb
+    xrextras-gesture-detector
+    xrextras-almost-there
+    xrextras-loading
+    xrextras-runtime-error
+    renderer="colorManagement: true; antialias: true; toneMapping: ACESFilmic; exposure: 1.6"
+    shadow="type: pcfsoft"
+    env-light="sky: #b9cfe4; horizon: #efe9dd; ground: #6f6659; intensity: 2.2"
+    multi-place="ground: #ground; hint: #hint; progress: #press;
+                 model: #pigeon-model; holdMs: 600; maxScale: 200"
+    shadow-fit="light: #sun">
+
+    <a-assets>
+      <!-- Stesso file della versione singola: nessuna copia, una sola cache. -->
+      <a-asset-item id="pigeon-model" src="../assets/pigeon.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- Luce ambientale dal cielo/terra + una direzionale che proietta l'ombra -->
+    <a-light id="hemi" type="hemisphere" color="#cfe0f0" groundColor="#6f6659" intensity="0.9"></a-light>
+    <a-light
+      id="sun"
+      type="directional"
+      intensity="2.6"
+      position="1.5 3 1"
+      castShadow="true"
+      light="shadowMapWidth: 2048; shadowMapHeight: 2048;
+             shadowCameraTop: 3; shadowCameraBottom: -3;
+             shadowCameraLeft: -3; shadowCameraRight: 3;
+             shadowCameraFar: 60"></a-light>
+
+    <!-- Piano invisibile: riceve i tap del raycast e cattura le ombre -->
+    <a-entity
+      id="ground"
+      class="cantap"
+      geometry="primitive: plane; width: 600; height: 600"
+      rotation="-90 0 0"
+      position="0 0 0"
+      material="shader: shadow; opacity: 0.32"
+      shadow="receive: true; cast: false"></a-entity>
+
+    <!-- I piccioni li crea multi-place a ogni pressione prolungata. -->
+
+    <a-camera position="0 1.6 0"></a-camera>
+
+  </a-scene>
+</body>
+
+</html>
