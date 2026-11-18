@@ -25,7 +25,8 @@ Pigeon/
       └─ place-pigeons.js  # solo multi-place; il resto lo riusa da ../place-pigeon.js
    └─ lava/                # variante senza piccione: tutto il pavimento è lava
       ├─ index.html
-      ├─ lava.js           # lava-floor (shader del pavimento) + lava-embers (braci)
+      ├─ lava.js           # lava-floor (shader + maschera), lava-embers, lava-tuner
+      ├─ seg-worker.js     # SegFormer in Web Worker: probabilità di suolo per pixel
       └─ assets/           # ambientCG Lava004 (CC0): emission + normal, 1K
 ```
 
@@ -69,14 +70,23 @@ nera → rosso → arancio → giallo) e sfuma in un bagliore uniforme verso l'o
 Parametri regolabili come attributi di `lava-floor` in `index.html`: `tile`, `flow`,
 `glow`, `spread`.
 
-**Maschera del pavimento.** 8th Wall non dà profondità né segmentazione (solo il cielo),
-quindi la lava compare solo dove l'immagine della camera somiglia al pavimento: prima di
-disegnarla si copia il canvas (che contiene già il feed camera) in una texture, e lo shader
-confronta ogni pixel con un colore di riferimento misurato su 9 punti a terra 1,6–3,4 m
-davanti, aggiornato ogni 0,5 s. Pesa la tinta; la luminosità è tollerata (ombre = lava).
-Funziona su pavimenti uniformi; sbaglia su fantasie, scacchi, oggetti dello stesso colore.
-Doppio tap = pannello di taratura (soglia, tolleranza ombre, luminosità, vedi maschera,
-rimisura) — temporaneo, da togliere a valori fissati.
+**Maschera del suolo (AI).** 8th Wall non dà profondità né segmentazione (solo il cielo),
+quindi la lava compare solo dove un modello di segmentazione vede *suolo*: SegFormer-B0
+ADE20K (`Xenova/segformer-b0-finetuned-ade-512-512`) via transformers.js 3.8.1, in un Web
+Worker (`seg-worker.js`). Categorie suolo: floor, road, grass, sidewalk, earth, rug, field,
+sand, path, runway, dirt track, land. Persone, auto, mobili, muri restano reali.
+
+- Il fotogramma si prende dal canvas (che contiene già il feed camera) un attimo prima
+  di disegnare la lava, ridotto a lato lungo 384 px su GPU e mandato al worker.
+- Riproiezione: ogni maschera porta con sé la camera dello scatto, e lo shader proietta
+  il punto del pavimento con quella. La maschera resta ferma sul mondo mentre il
+  telefono gira, anche se il modello va a pochi fotogrammi al secondo.
+- Backend: WebGPU fp32 (15 MB), altrimenti WASM q8 (4 MB). Ogni tentativo in un worker
+  nuovo: la variante fp16 su WebGPU fallisce e lascia onnxruntime rotto nel worker.
+- La colata parte quando arriva la prima maschera.
+
+Doppio tap = pannello (soglia suolo, luminosità, vedi maschera, on/off, backend e
+velocità del modello) — temporaneo, da togliere a valori fissati.
 
 Il modello è 0,42 × 0,21 × 0,22 m, cioè la taglia di un piccione vero. Scala 1:1.
 
