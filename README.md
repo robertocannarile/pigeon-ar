@@ -69,9 +69,14 @@ nera → rosso → arancio → giallo) e sfuma in un bagliore uniforme verso l'o
 Parametri regolabili come attributi di `lava-floor` in `index.html`: `tile`, `flow`,
 `glow`, `spread`.
 
-Limite: niente occlusione. La lava è disegnata sopra la camera e copre anche ciò che
-poggia a terra (piedi, mobili, la parte bassa dei muri). Rende meglio all'aperto o su un
-pavimento sgombro.
+**Maschera del pavimento.** 8th Wall non dà profondità né segmentazione (solo il cielo),
+quindi la lava compare solo dove l'immagine della camera somiglia al pavimento: prima di
+disegnarla si copia il canvas (che contiene già il feed camera) in una texture, e lo shader
+confronta ogni pixel con un colore di riferimento misurato su 9 punti a terra 1,6–3,4 m
+davanti, aggiornato ogni 0,5 s. Pesa la tinta; la luminosità è tollerata (ombre = lava).
+Funziona su pavimenti uniformi; sbaglia su fantasie, scacchi, oggetti dello stesso colore.
+Doppio tap = pannello di taratura (soglia, tolleranza ombre, luminosità, vedi maschera,
+rimisura) — temporaneo, da togliere a valori fissati.
 
 Il modello è 0,42 × 0,21 × 0,22 m, cioè la taglia di un piccione vero. Scala 1:1.
 
