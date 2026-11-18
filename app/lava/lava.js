@@ -40,7 +40,7 @@ AFRAME.registerComponent('lava-floor', {
     spread: {default: 0.9},      // velocita' di espansione (m/s^2 circa)
     hint: {type: 'selector'},
     mask: {default: true},       // lava solo dove il modello vede suolo
-    worker: {default: './seg-worker.js?v=4'},
+    worker: {default: './seg-worker.js?v=5'},
     segSize: {default: 384},     // lato lungo dell'immagine data al modello (multiplo di 32)
     threshold: {default: 0.5},   // probabilita' di suolo oltre cui c'e' lava
     fade: {default: 140},        // ms di dissolvenza tra una maschera e la successiva
@@ -666,6 +666,7 @@ AFRAME.registerComponent('lava-tuner', {
     if (!f || !f.uniforms) { return }
     const s = f.stats
     this.out.textContent =
+      `versione 5 · maschera ${f.uniforms.uMaskOn.value ? 'attiva' : 'spenta'}\n` +
       `modello: ${s.device}\n` +
       `analisi: ${s.ms ? s.ms.toFixed(0) : '—'} ms · ${s.fps.toFixed(1)} al secondo\n` +
       `threshold: ${f.uniforms.uThreshold.value.toFixed(2)}; glow: ${f.uniforms.uGlow.value.toFixed(2)}` +
