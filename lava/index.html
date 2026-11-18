@@ -11,7 +11,7 @@
     data-preload-chunks="slam"></script>
   <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
 
-  <script src="./lava.js"></script>
+  <script src="./lava.js?v=2"></script>
 
   <style>
     body { margin: 0; overflow: hidden; }
@@ -37,11 +37,71 @@
 
     /* Il logo "Powered by 8th Wall" degli schermi di caricamento/errore di xrextras. */
     .poweredby-img { display: none !important; }
+
+    /* Pannello di taratura della maschera, aperto con doppio tap. Da rimuovere a valori fissati. */
+    #tuner {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 12px) + 12px);
+      right: 12px;
+      width: min(80vw, 300px);
+      padding: 14px 16px 16px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, .72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      color: #fff;
+      font: 500 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      z-index: 20;
+    }
+
+    #tuner[hidden] { display: none; }
+
+    #tuner label {
+      display: flex;
+      justify-content: space-between;
+      margin: 12px 0 4px;
+      opacity: .85;
+    }
+
+    #tuner label b { font-variant-numeric: tabular-nums; }
+
+    #tuner small { display: block; opacity: .55; font-size: 11px; margin-top: 2px; }
+
+    #tuner input[type="range"] { width: 100%; margin: 0; accent-color: #fff; }
+
+    #tuner .row { display: flex; gap: 8px; margin-top: 12px; }
+
+    #tuner button {
+      flex: 1;
+      padding: 9px 0;
+      border: 0;
+      border-radius: 9px;
+      background: rgba(255, 255, 255, .16);
+      color: #fff;
+      font: 600 12px -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    #tuner-status { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+
+    #tuner-swatch {
+      flex: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, .5);
+    }
+
+    #tuner-out {
+      flex: 1;
+      white-space: pre-wrap;
+      font: 500 10.5px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+      opacity: .9;
+    }
   </style>
 </head>
 
 <body>
-  <div id="hint">Inquadra il pavimento e muovi piano il telefono</div>
+  <div id="hint">Inquadra il pavimento libero e muovi piano il telefono</div>
 
   <!-- Motore AR: XR Engine, © 2026 Niantic Spatial, Inc. Distribuito sotto XR Engine
        License Agreement (https://8thwall.org/docs/open-source), fornito "as is", senza
@@ -49,14 +109,42 @@
        su richiesta dell'utente non è visibile a schermo, resta qui e nel README.
        Texture lava: ambientCG Lava004, CC0. -->
 
+  <!-- Pannello di taratura: doppio tap sullo schermo per aprirlo e chiuderlo. -->
+  <div id="tuner" hidden>
+    <label>Soglia pavimento <b data-out="thresh">—</b></label>
+    <input type="range" data-key="thresh" min="0.01" max="0.25" step="0.005" value="0.05">
+    <small>più alta = più lava, anche sugli oggetti</small>
+
+    <label>Tolleranza ombre <b data-out="lumTol">—</b></label>
+    <input type="range" data-key="lumTol" min="0" max="3" step="0.05" value="1.3">
+    <small>più alta = le ombre restano lava, ma anche oggetti scuri</small>
+
+    <label>Luminosità lava <b data-out="glow">—</b></label>
+    <input type="range" data-key="glow" min="0.4" max="2.5" step="0.05" value="1.25">
+
+    <div class="row">
+      <button data-action="resample">Rimisura pavimento</button>
+      <button data-action="show">Vedi maschera</button>
+    </div>
+    <div class="row">
+      <button data-action="mask">Maschera: on</button>
+    </div>
+
+    <div id="tuner-status">
+      <div id="tuner-swatch"></div>
+      <div id="tuner-out">—</div>
+    </div>
+  </div>
+
   <a-scene
     xrweb
     xrextras-almost-there
     xrextras-loading
     xrextras-runtime-error
-    renderer="colorManagement: true; antialias: true; toneMapping: ACESFilmic; exposure: 1.3"
+    renderer="colorManagement: true; antialias: false; toneMapping: ACESFilmic; exposure: 1.3"
     lava-floor="hint: #hint"
-    lava-embers>
+    lava-embers
+    lava-tuner="panel: #tuner">
 
     <!-- La camera parte a 1,6 m: lo SLAM di 8th Wall mette il pavimento a y = 0. -->
     <a-camera position="0 1.6 0"></a-camera>
