@@ -11,7 +11,7 @@
     data-preload-chunks="slam"></script>
   <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
 
-  <script src="./lava.js?v=2"></script>
+  <script src="./lava.js?v=4"></script>
 
   <style>
     body { margin: 0; overflow: hidden; }
@@ -38,7 +38,7 @@
     /* Il logo "Powered by 8th Wall" degli schermi di caricamento/errore di xrextras. */
     .poweredby-img { display: none !important; }
 
-    /* Pannello di taratura della maschera, aperto con doppio tap. Da rimuovere a valori fissati. */
+    /* Pannello di taratura, aperto con doppio tap. Da rimuovere a valori fissati. */
     #tuner {
       position: fixed;
       top: calc(env(safe-area-inset-top, 12px) + 12px);
@@ -83,14 +83,6 @@
 
     #tuner-status { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
 
-    #tuner-swatch {
-      flex: none;
-      width: 28px;
-      height: 28px;
-      border-radius: 7px;
-      border: 1px solid rgba(255, 255, 255, .5);
-    }
-
     #tuner-out {
       flex: 1;
       white-space: pre-wrap;
@@ -111,27 +103,19 @@
 
   <!-- Pannello di taratura: doppio tap sullo schermo per aprirlo e chiuderlo. -->
   <div id="tuner" hidden>
-    <label>Soglia pavimento <b data-out="thresh">—</b></label>
-    <input type="range" data-key="thresh" min="0.01" max="0.25" step="0.005" value="0.05">
-    <small>più alta = più lava, anche sugli oggetti</small>
-
-    <label>Tolleranza ombre <b data-out="lumTol">—</b></label>
-    <input type="range" data-key="lumTol" min="0" max="3" step="0.05" value="1.3">
-    <small>più alta = le ombre restano lava, ma anche oggetti scuri</small>
+    <label>Soglia suolo <b data-out="threshold">—</b></label>
+    <input type="range" data-key="threshold" min="0.1" max="0.9" step="0.02" value="0.5">
+    <small>più bassa = più lava (anche su oggetti incerti), più alta = solo suolo sicuro</small>
 
     <label>Luminosità lava <b data-out="glow">—</b></label>
     <input type="range" data-key="glow" min="0.4" max="2.5" step="0.05" value="1.25">
 
     <div class="row">
-      <button data-action="resample">Rimisura pavimento</button>
       <button data-action="show">Vedi maschera</button>
-    </div>
-    <div class="row">
       <button data-action="mask">Maschera: on</button>
     </div>
 
     <div id="tuner-status">
-      <div id="tuner-swatch"></div>
       <div id="tuner-out">—</div>
     </div>
   </div>
