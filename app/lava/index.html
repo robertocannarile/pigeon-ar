@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Lava AR</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/aframe@1.7.1/dist/aframe-master.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/engine-binary@1/dist/xr.js" async crossorigin="anonymous"
+    data-preload-chunks="slam"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@8thwall/xrextras@1/dist/xrextras.js" crossorigin="anonymous"></script>
+
+  <script src="./lava.js"></script>
+
+  <style>
+    body { margin: 0; overflow: hidden; }
+
+    #hint {
+      position: fixed;
+      bottom: 7vh;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, .55);
+      color: #fff;
+      font: 500 15px/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: .01em;
+      white-space: nowrap;
+      z-index: 10;
+      pointer-events: none;
+      transition: opacity .6s ease;
+    }
+
+    #hint.hidden { opacity: 0; }
+
+    /* Il logo "Powered by 8th Wall" degli schermi di caricamento/errore di xrextras. */
+    .poweredby-img { display: none !important; }
+  </style>
+</head>
+
+<body>
+  <div id="hint">Inquadra il pavimento e muovi piano il telefono</div>
+
+  <!-- Motore AR: XR Engine, © 2026 Niantic Spatial, Inc. Distribuito sotto XR Engine
+       License Agreement (https://8thwall.org/docs/open-source), fornito "as is", senza
+       garanzie. La licenza chiede questa attribuzione nel materiale che usa il motore;
+       su richiesta dell'utente non è visibile a schermo, resta qui e nel README.
+       Texture lava: ambientCG Lava004, CC0. -->
+
+  <a-scene
+    xrweb
+    xrextras-almost-there
+    xrextras-loading
+    xrextras-runtime-error
+    renderer="colorManagement: true; antialias: true; toneMapping: ACESFilmic; exposure: 1.3"
+    lava-floor="hint: #hint"
+    lava-embers>
+
+    <!-- La camera parte a 1,6 m: lo SLAM di 8th Wall mette il pavimento a y = 0. -->
+    <a-camera position="0 1.6 0"></a-camera>
+
+  </a-scene>
+</body>
+
+</html>

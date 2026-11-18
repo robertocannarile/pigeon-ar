@@ -2,6 +2,7 @@
 
 **Un piccione → https://robertocannarile.github.io/pigeon-ar/**
 **Più piccioni → https://robertocannarile.github.io/pigeon-ar/multi/**
+**Pavimento di lava → https://robertocannarile.github.io/pigeon-ar/lava/** (non ancora pubblicata)
 
 Esperienza di realtà aumentata da browser: tieni premuto sul pavimento e appare un piccione
 a scala reale che cammina in loop.
@@ -22,6 +23,10 @@ Pigeon/
    └─ multi/               # versione a più piccioni, stesso glb
       ├─ index.html
       └─ place-pigeons.js  # solo multi-place; il resto lo riusa da ../place-pigeon.js
+   └─ lava/                # variante senza piccione: tutto il pavimento è lava
+      ├─ index.html
+      ├─ lava.js           # lava-floor (shader del pavimento) + lava-embers (braci)
+      └─ assets/           # ambientCG Lava004 (CC0): emission + normal, 1K
 ```
 
 ## Come funziona
@@ -51,6 +56,22 @@ selezione in rapporto alla scala corrente.
 Non c'è modo di togliere un piccione: per ripulire si ricarica la pagina. `shadow-fit` segue
 l'attivo, quindi con un gigante in scena l'ombra di un piccolo molto lontano può uscire dai
 bounds della shadow camera.
+
+### Variante lava (`/lava/`)
+
+Nessun piccione e nessun gesto. A tracking pronto la lava si allarga a cerchio dai piedi
+dell'utente fino all'orizzonte (~20 s), con braci che salgono attorno.
+
+Il pavimento è un piano di 800 m con shader non illuminato: la texture di emissione di
+ambientCG `Lava004` è campionata due volte con scorrimenti incrociati e deformata dalla
+normal map, per l'effetto liquido. Il calore passa poi per una rampa di colore (crosta
+nera → rosso → arancio → giallo) e sfuma in un bagliore uniforme verso l'orizzonte.
+Parametri regolabili come attributi di `lava-floor` in `index.html`: `tile`, `flow`,
+`glow`, `spread`.
+
+Limite: niente occlusione. La lava è disegnata sopra la camera e copre anche ciò che
+poggia a terra (piedi, mobili, la parte bassa dei muri). Rende meglio all'aperto o su un
+pavimento sgombro.
 
 Il modello è 0,42 × 0,21 × 0,22 m, cioè la taglia di un piccione vero. Scala 1:1.
 
@@ -95,6 +116,7 @@ la storia è divergente, rifare con
 ## Licenze
 
 - Framework e `xrextras`: MIT
+- Texture lava: ambientCG `Lava004`, CC0 (nessuna attribuzione richiesta)
 - Motore SLAM (`@8thwall/engine-binary`): licenza limited-use, gratuita anche per uso
   commerciale. Non modificabile né decompilabile. **Richiede attribuzione a Niantic Spatial.**
   Vedi https://8thwall.org/docs/open-source
